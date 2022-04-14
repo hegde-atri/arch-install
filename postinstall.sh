@@ -6,6 +6,20 @@ echo -ne "
 | Post install script
 -------------------------------
 "
+sleep 2
+figlet -k " WARNING"
+echo -ne "
+---------------------------------------------
+|  This script only installs DWM as of now  |
+|           press y to continue             |
+|               or n to quit                |
+---------------------------------------------
+"
+echo -n "Your response: "
+read warn
+if [ "$warn" == "n" ] ; then
+  exit
+fi
 
 # prerequisites
 sudo pacman -S --noconfirm --needed python-pywal figlet
