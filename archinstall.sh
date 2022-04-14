@@ -11,7 +11,7 @@ sed -i "s/^#ParallelDownloads = 5$/ParallelDownloads = 10/" /etc/pacman.conf
 pacman --noconfirm -Sy archlinux-keyring
 echo "use colemak instead of qwerty? [y/n] "
 read klayout
-if [[ $klayout = y]] ; then
+if [ "$klayout" = "y"]; then
   loadkeys colemak
 else
   loadkeys us
@@ -61,7 +61,7 @@ echo "LANG=en_GB.UTF-8" > /etc/locale.conf
 echo "-------------------------------------"
 echo "use colemak instead of qwerty? (y/n) : "
 read klayout
-if [[ $klayout = y]] ; then
+if [ "$klayout" = "y"]; then
   echo "KEYMAP=colemak" > /etc/vconsole.conf
 else
   echo "KEYMAP=us" > /etc/vconsole.conf
@@ -88,9 +88,9 @@ echo "| For AMD, enter a                    |"
 echo "---------------------------------------"
 echo "Your processor option: "
 read $processor
-if [[ $processor = a]] ; then
+if [ "$processor" = "a"]; then
   pacman -S --noconfirm amd-ucode
-elif [[ $processor = i ]]
+elif [ "$processor" = "i" ]; then
   pacman -S --noconfirm intel-ucode
 else
   pacman -S --noconfirm intel-ucode amd-ucode
