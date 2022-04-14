@@ -44,6 +44,7 @@ sudo make -C ~/source/dwm install
 
 # dmenu - program menu / program launcher
 git clone --depth=1 https://github.com/hegde-atri/dmenu.git ~/source/dmenu
+sed -i 's/#include \"\/home\/mizuuu\/.cache\/wal\/colors-wal-dmenu.h\"/#include \"\/home\/"$USER"\/.cache\/wal\/colors-wal-dmenu.h\"/g' ~/source/dmenu/config.h
 sudo make -C ~/source/dmenu install
 
 # dwmblocks-async - status bar for dwm
