@@ -79,7 +79,8 @@ if [ "$response" == "y" ] ; then
   mkdir $HOME/.local/bin/statusbar
   cp --symbolic-link $HOME/source/dwmblocks-async/scripts/* $HOME/.local/bin/statusbar
   mkdir 
-  cp --symbolic-link $HOME/source/dwm/autostart.sh $HOME/.dwm
+  cp $HOME/source/dwm/autostart.sh $HOME/.dwm
+  cp $HOME/source/dwm/autostart_blocking.sh $HOME/.dwm
 
   # pywal fix
   echo "" >> bpath
