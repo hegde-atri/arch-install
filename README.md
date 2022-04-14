@@ -4,6 +4,8 @@ Deploys arch on target system. Use postinstallation script to install a Desktop 
 
 This script it not intended for complete beginners. Make sure to be familiar with installing arch or read through the arch installation guide.
 
+Only supports efi installs.
+
 ## Usage
 
 After booting into your arch live ISO, make sure you have a working internet connection.
