@@ -8,7 +8,7 @@ echo -ne "
 "
 
 # prerequisites
-sudo pacman -S --noconfirm python-pywal figlet
+sudo pacman -S --noconfirm --needed python-pywal figlet
 mkdir ~/source
 git clone --depth=1 https://github.com/hegde-atri/wallpapers.git ~/.wallpapers
 wal -i ~/.wallpapers/aesthetic/wallhaven-gjyoq7.png
@@ -46,10 +46,49 @@ echo "-------------------------------------------"
 echo -n "Your response: "
 read response
 if [ "$response" == "y" ] ; then
+  # configure .xinitrc
+  xpath=$HOME/.xinitrc
+  bpath=$HOME/.bashrc
+  sudo pacman -S --needed --noconfirm xorg-server xorg-xinit xorg-xrandr xorg-xsetroot
+  cp /etc/X11/xinit/xinitrc xpath
+  sed -i 's/xclock -geometry 50x50-1+1 &/#xclock -geometry 50x50-1+1 &/g' xpath
+  sed -i 's/xterm -geometry 80x50+494+51 &/#xterm -geometry 80x50+494+51 &/g' xpath
+  sed -i 's/xterm -geometry 80x20+494-0 &/#xterm -geometry 80x20+494-0 &/g' xpath
+  sed -i 's/exec xterm -geometry 80x66+0+0 -name login/#exec xterm -geometry 80x66+0+0 -name login/g' xpath
+  sed -i 's/twm &//g' xpath
+  echo "" >> xpath
+  echo "wal -R" >> xpath
+  echo "twm &" >> xpath
+  echo "exec dwm" >> xpath
 
+  # create symlinks
+  mkdir $HOME/.local/bin/statusbar
+  cp --symbolic-link $HOME/source/dwmblocks-async/scripts/* $HOME/.local/bin/statusbar
+  mkdir 
+  cp --symbolic-link $HOME/source/dwm/autostart.sh $HOME/.dwm
 
+  # pywal fix
+  echo "" >> bpath
+  echo "# pywal fix" >> bpath
+  echo "(cat ~/.cache/wal/sequences &)" >> bpath
+  echo "cat ~/.cache/wal/sequences" >> bpath
+  echo "source ~/.cache/wal/colors-tty.sh" >> bpath
+  echo ". "${HOME}/.cache/wal/colors.sh"" >> bpath
+  echo "#status bar scripts" >> bpath
+  echo "export PATH="$HOME/.local/bin/statusbar:$PATH"" >> bpath
+  echo "# dwm-pywal fix" >> bpath
+  echo "sed -i '/urg/d' ~/.cache/wal/colors-wal-dwm.h" >> bpath
 
-
+  figlet -k "DONE"
+  echo -ne "
+  -----------------------------------------------
+  |         Log out and log back in to          |
+  |           refresh path locations!           |
+  |     Then use command startx to launch dwm   |
+  -----------------------------------------------
+  "
+  sleep 5
+  exit
 else
   echo "------------------------------------------"
   echo "| You can now delete me ~/postinstall.sh |"
