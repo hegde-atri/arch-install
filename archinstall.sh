@@ -3,13 +3,17 @@
 #######################################################
 # part1: make necassary partitions and chroot into it #
 #######################################################
+pacman -S --noconfirm figlet
 printf '\033c'
+figlet -k "hegde_atri's arch installer"
 echo "----------------------------------------------"
 echo "|        hegde_atri's arch installer         |"
 echo "----------------------------------------------"
-sed -i "s/^#ParallelDownloads = 5$/ParallelDownloads = 10/" /etc/pacman.conf
+sed -i "s/^#ParallelDownloads = 5$/ParallelDownloads = 15/" /etc/pacman.conf
 pacman --noconfirm -Sy archlinux-keyring
-echo "use colemak instead of qwerty? [y/n] "
+figlet -k "choose keymap"
+echo "----------------------------------------"
+echo -n "use colemak instead of qwerty? [y/n] "
 read klayout
 if [ "$klayout" == "y" ]; then
   loadkeys colemak
@@ -18,30 +22,33 @@ else
 fi
 timedatectl set-ntp true
 lsblk
-echo "Enter drive name (ex: /dev/sda): "
+echo -n "Enter drive name (ex: /dev/sda): "
 read drive
-cfdisk /dev/$drive
+cfdisk $drive
+sleep 2
+printf '\033c'
 lsblk
-echo "Enter root partition (ex: /dev/sda1): "
+echo -n "Enter root partition (ex: /dev/sda1): "
 read partition
 mkfs.ext4 $partition
 lsblk
-echo "Enter swap partition (ex: /dev/sda1): "
+echo -n "Enter swap partition (ex: /dev/sda1): "
 read swappartition
 mkswap $swappartition
 lsblk
-echo "Enter EFI partition (ex: /dev/sda1): "
+echo -n "Enter EFI partition (ex: /dev/sda1): "
 read efipartition
 mkfs.vfat -F 32 $efipartition
 mount $partition /mnt
-mount --mkdir /mnt/boot
+mount --mkdir $efipartition /mnt/boot
 swapon /dev/$swappartition
-pacstrap /mnt base base-devel linux linux-firmware
+pacstrap /mnt base base-devel linux linux-firmware figlet
 genfstab -U /mnt >> /mnt/etc/fstab
 # getting ready to arch-chroot
 cp postinstall.sh /mnt/home
 sed '1,/^#p2start$/d' `basename $0` > /mnt/archinstall2.sh
 chmod +x /mnt/archinstall2.sh
+figlet -k "arch-chrooting"
 echo "-----------------------------------------"
 echo "| arch-chrooting into your machine now! |"
 echo "-----------------------------------------"
@@ -52,14 +59,16 @@ exit
 #################################
 # part2: arch-chroot and config #
 #################################
+printf '\033c'
 ln -sf /usr/share/zoneinfo/Europe/London /etc/localtime
 hwclock --systohc
 sed -i "s/^#ParallelDownloads = 5$/ParallelDownloads = 15/" /etc/pacman.conf
 sed -i 's/#en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/g' /etc/locale.gen
 locale-gen
 echo "LANG=en_GB.UTF-8" > /etc/locale.conf
+figlet -k "keymap"
 echo "-------------------------------------"
-echo "use colemak instead of qwerty? (y/n) : "
+echo -n "use colemak instead of qwerty? (y/n) : "
 read klayout
 if [ "$klayout" == "y" ]; then
   echo "KEYMAP=colemak" > /etc/vconsole.conf
@@ -69,25 +78,24 @@ fi
 echo "Enter your hostname: "
 read hostname
 echo "$hostname" > /etc/hostname
-echo "127.0.0.1       localhost" >> /etc/hosts
-echo "::1             localhost" >> /etc/hosts
-echo "127.0.1.1       $hostname.localdomain $hostname" >> /etc/hosts
-echo "-------------------"
-echo "| CHECK HOST FILE |"
-echo "-------------------"
-getent hosts
-sleep 3
+echo -ne "
+127.0.0.1       localhost
+::1             localhost
+127.0.1.1       $hostname.localdomain $hostname" > /etc/hosts
 mkinitcpio -P
+figlet -k "root"
+figlet -k "password"
 passwd
 pacman --noconfirm -S grub efibootmgr os-prober
+figlet -k "microcode"
 echo "---------------------------------------"
 echo "| select processor make for microcode |"
 echo "|=====================================|"
 echo "| For Intel, enter i                  |"
 echo "| For AMD, enter a                    |"
 echo "---------------------------------------"
-echo "Your processor option: "
-read $processor
+echo -n "Your processor option: "
+read processor
 if [ "$processor" == "a" ]; then
   pacman -S --noconfirm amd-ucode
 elif [ "$processor" == "i" ]; then
@@ -104,17 +112,19 @@ pacman -S --noconfirm xorg-server xorg-xinit xorg-xkill xorg-xsetroot xorg-xback
       noto-fonts noto-fonts-emoji noto-fonts-cjk ttf-jetbrains-mono ttf-joypixels ttf-font-awesome \
       feh mpv zathura zathura-pdf-mupdf ffmpeg imagemagick  \
       fzf man-db xwallpaper python-pywal unclutter xclip maim \
-      zip unzip unrar p7zip xdotool papirus-icon-theme ran  \
+      zip unzip unrar p7zip xdotool papirus-icon-theme \
       dosfstools ntfs-3g git sxhkd fish pipewire pipewire-pulse \
       vim arc-gtk-theme rsync firefox neofetch \
       xcompmgr libnotify dunst slock jq aria2 cowsay \
       dhcpcd connman wpa_supplicant pamixer mpd ncmpcpp \
-      xdg-user-dirs libconfig polkit \
+      xdg-user-dirs libconfig polkit kitty \
       bluez bluez-utils networkmanager emacs
 
 systemctl enable NetworkManager.service
 echo "%wheel ALL=(ALL) ALL" >> /etc/sudoers
-echo "Enter your username: "
+figlet -k "creating"
+figlet -k "user"
+echo -n "Enter your username: "
 read username
 useradd -m -G wheel $username
 passwd $username
@@ -128,4 +138,4 @@ echo "| Done using the following command               |"
 echo "| sudo sh postinstall.sh                         |"
 echo "--------------------------------------------------"
 
-# part3: choose DE/WM - coming soon
+exit
