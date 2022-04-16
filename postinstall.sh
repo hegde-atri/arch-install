@@ -23,10 +23,10 @@ fi
 
 # prerequisites
 sudo pacman -S --noconfirm --needed python-pywal figlet
-mkdir ~/source
+mkdir $HOME/source
 git clone --depth=1 https://github.com/hegde-atri/wallpapers.git ~/.wallpapers
-wal -i ~/.wallpapers/aesthetic/wallhaven-gjyoq7.png
-sed -i '/urg/d' ~/.cache/wal/colors-wal-dwm.h # as we don't have the urgent patch for dwm
+wal -i $HOME/.wallpapers/aesthetic/wallhaven-gjyoq7.png
+sed -i '/urg/d' $HOME/.cache/wal/colors-wal-dwm.h # as we don't have the urgent patch for dwm
 
 printf '\033c'
 figlet -k "DWM"
@@ -39,17 +39,17 @@ echo -ne "
 sleep 5
 # dwm - tiling window manager
 git clone --depth=1 https://github.com/hegde-atri/dwm.git ~/source/dwm
-sed -i 's/#include \"\/home\/mizuuu\/.cache\/wal\/colors-wal-dwm.h\"/#include \"\/home\/"$USER"\/.cache\/wal\/colors-wal-dwm.h\"/g' ~/source/dwm/config.h
-sudo make -C ~/source/dwm install
+sed -i 's/#include \"\/home\/mizuuu\/.cache\/wal\/colors-wal-dwm.h\"/#include \"\/home\/'$USER'\/.cache\/wal\/colors-wal-dwm.h\"/g' ~/source/dwm/config.h
+sudo make -C $HOME/source/dwm install
 
 # dmenu - program menu / program launcher
 git clone --depth=1 https://github.com/hegde-atri/dmenu.git ~/source/dmenu
-sed -i 's/#include \"\/home\/mizuuu\/.cache\/wal\/colors-wal-dmenu.h\"/#include \"\/home\/"$USER"\/.cache\/wal\/colors-wal-dmenu.h\"/g' ~/source/dmenu/config.h
-sudo make -C ~/source/dmenu install
+sed -i 's/#include \"\/home\/mizuuu\/.cache\/wal\/colors-wal-dmenu.h\"/#include \"\/home\/'$USER'\/.cache\/wal\/colors-wal-dmenu.h\"/g' ~/source/dmenu/config.h
+sudo make -C $HOME/source/dmenu install
 
 # dwmblocks-async - status bar for dwm
 git clone --depth=1 https://github.com/hegde-atri/dwmblocks-async.git ~source/dwmblocks-async
-sudo make -C ~/source/dwmblocks-async install
+sudo make -C $HOME/source/dwmblocks-async install
 
 figlet -k "!!IMPORTANT!! READ BELOW"
 echo "-------------------------------------------"
@@ -72,13 +72,14 @@ if [ "$response" == "y" ] ; then
   sed -i 's/exec xterm -geometry 80x66+0+0 -name login/#exec xterm -geometry 80x66+0+0 -name login/g' xpath
   sed -i 's/twm &//g' xpath
   echo "" >> xpath
+  echo "xrandr --output DP-4 --mode 1920x1080 --rate 144.00" >> xpath
   echo "wal -R" >> xpath
   echo "twm &" >> xpath
   echo "exec dwm" >> xpath
 
   # create symlinks
   mkdir $HOME/.local/bin/statusbar
-  cp --symbolic-link $HOME/source/dwmblocks-async/scripts/* $HOME/.local/bin/statusbar
+  cp $HOME/source/dwmblocks-async/scripts/* $HOME/.local/bin/statusbar
   mkdir 
   cp $HOME/source/dwm/autostart.sh $HOME/.dwm
   cp $HOME/source/dwm/autostart_blocking.sh $HOME/.dwm
@@ -90,7 +91,7 @@ if [ "$response" == "y" ] ; then
   echo "cat ~/.cache/wal/sequences" >> bpath
   echo "source ~/.cache/wal/colors-tty.sh" >> bpath
   echo ". "${HOME}/.cache/wal/colors.sh"" >> bpath
-  echo "#status bar scripts" >> bpath
+  echo "# status bar scripts" >> bpath
   echo "export PATH="$HOME/.local/bin/statusbar:$PATH"" >> bpath
   echo "# dwm-pywal fix" >> bpath
   echo "sed -i '/urg/d' ~/.cache/wal/colors-wal-dwm.h" >> bpath
