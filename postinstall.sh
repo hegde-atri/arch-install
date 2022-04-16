@@ -10,7 +10,7 @@ sleep 2
 figlet -k " WARNING"
 echo -ne "
 ---------------------------------------------
-|  This script only installs DWM as of now  |
+|      This script not stable as of now     |
 |           press y to continue             |
 |               or n to quit                |
 ---------------------------------------------
