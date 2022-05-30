@@ -1,5 +1,5 @@
-# This script will deploy arch linux with my suckless dwm config.
-
+# This script will deploy arch linux with options to install de/wm
+#
 #######################################################
 # part1: make necassary partitions and chroot into it #
 #######################################################
@@ -32,6 +32,12 @@ lsblk
 echo -n "Enter root partition (ex: /dev/sda1): "
 read partition
 mkfs.ext4 $partition
+printf '\033c'
+figlet -k "home"
+lsblk
+echo -n "Enter home partition (ex: /dev/sda1): "
+read homepartition
+mount --mkdir $homepartition /mnt/home
 printf '\033c'
 figlet -k "swap"
 lsblk
@@ -117,18 +123,26 @@ echo "GRUB_DISABLE_OS_PROBER=false" >> /etc/default/grub
 grub-mkconfig -o boot/grub/grub.cfg
 figlet -k "installing packages"
 
-pacman -S --noconfirm xorg-server xorg-xinit xorg-xkill xorg-xsetroot xorg-xbacklight xorg-xprop \
+pacman -S --noconfirm xorg lxappearance\
       noto-fonts noto-fonts-emoji noto-fonts-cjk ttf-jetbrains-mono ttf-joypixels ttf-font-awesome \
       feh mpv zathura zathura-pdf-mupdf ffmpeg imagemagick  \
       fzf man-db xwallpaper python-pywal unclutter xclip maim \
       zip unzip unrar p7zip xdotool papirus-icon-theme \
       dosfstools ntfs-3g git sxhkd fish pipewire pipewire-pulse \
       vim arc-gtk-theme rsync firefox neofetch \
-      xcompmgr libnotify dunst slock jq aria2 cowsay \
+      libnotify dunst jq aria2 \
       dhcpcd connman wpa_supplicant pamixer mpd ncmpcpp \
       xdg-user-dirs libconfig polkit kitty \
-      bluez bluez-utils networkmanager emacs
+      bluez bluez-utils networkmanager emacs polkit-gnome gnome-keyring
 
+echo "-------------------------------------"
+echo "| Do you want nvidia drivers? (y/n) |"
+echo "-------------------------------------"
+echo -n "Your response: "
+read nvdia
+if [ "$nvidia" == "y" ] ; then
+  pacman -S --noconfirm nvidia nvidia-utils nvtop
+fi
 systemctl enable NetworkManager.service
 echo "%wheel ALL=(ALL) ALL" >> /etc/sudoers
 figlet -k "creating"
@@ -137,14 +151,36 @@ echo -n "Enter your username: "
 read username
 useradd -m -G wheel $username
 passwd $username
-pi_path=/home/$username/postinstall.sh
-mv /home/postinstall.sh $pi_path
-chown $username:$username $pi_path
-chmod +x $pi_path
-echo "--------------------------------------------------"
-echo "| Reboot and run postinstall.sh in your home dir |"
-echo "| Done using the following command               |"
-echo "| sudo sh postinstall.sh                         |"
-echo "--------------------------------------------------"
+pi_path=/home/$username/archinstall
+git clone https://github.com/hegde-atri/arch-install "$pi_path"
+figlet -k "finished base install"
+echo "==================================="
+echo "| select your install option      |"
+echo "|---------------------------------|"
+echo "| (a) - bspwm + dotfiles          |"
+#echo "| (b) - bspwm                     |"
+#echo "| (c) - dwm                       |"
+#echo "| (d) - kde                       |"
+#echo "| (e) - xfce                      |"
+echo "| (q) - nothing, quit             |"
+echo "|---------------------------------|"
+echo "| You can choose only one option  |"
+echo "==================================="
+echo -n "Your response: "
+read wmde
+if [ "$wmde" == "a" ] ; then
+  sh "$pi_path"/extra/myconfig.sh full
+#elif [ "$wmde" == "b" ] ; then
+#  sh "$pi_path"/extra/bspwm.sh
+#elif [ "$wmde" == "c" ] ; then
+#  sh "$pi_path"/extra/dwm.sh
+#elif [ "$wmde" == "d" ] ; then
+#  sh "$pi_path"/extra/kde.sh
+#elif [ "$wmde" == "e" ] ; then
+#  sh "$pi_path"/extra/xfce.sh
+else
+  figlet -k "Thank you for using me!"
+  figlet -k "star my repo !"
+fi
 
 exit
