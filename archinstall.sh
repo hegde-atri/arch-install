@@ -56,4 +56,64 @@ arch-chroot /mnt ./archinstall2.sh
 exit
 
 #p2start
-
+printf '\033c'
+ln -sf /usr/share/zoneinfo/Europe/London /etc/localtime
+hwclock --systohc
+sed -i "s/^#ParallelDownloads = 5$/ParallelDownloads = 15/" /etc/pacman.conf
+sed -i 's/#en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/g' /etc/locale.gen
+locale-gen
+echo "LANG=en_GB.UTF-8" > /etc/locale.conf
+echo "KEYMAP=uk" > /etc/vconsole.conf
+printf '\033c'
+echo -n "Enter hostname: "
+read hostname
+echo "$hostname" > /etc/hostname
+echo -ne "
+127.0.0.1       localhost
+::1             localhost
+127.0.1.1       '$hostname'.localdomain '$hostname'" > /etc/hosts
+mkinitcpio -P
+printf '\033c'
+echo "Enter your root password"
+passwd
+printf '\033c'
+pacman --noconfirm -S grub efibootmgr os-prober
+printf '\033c'
+echo "---------------------------------------"
+echo "| select processor make for microcode |"
+echo "|=====================================|"
+echo "| For Intel, enter i                  |"
+echo "| For AMD, enter a                    |"
+echo "| Leave blank for both                |"
+echo "---------------------------------------"
+echo -n "Your processor option: "
+read processor
+if [ "$processor" == "a" ] ; then
+  pacman -S --noconfirm amd-ucode
+elif [ "$processor" == "i" ] ; then
+  pacman -S --noconfirm intel-ucode
+else
+  pacman -S --noconfirm intel-ucode amd-ucode
+fi
+grub-install --target=x86_64-efi --efi-directory=boot --bootloader-id=GRUB
+grub-install --target=x86_64-efi --efi-directory=boot --removable
+echo "GRUB_DISABLE_OS_PROBER=false" >> /etc/default/grub
+grub-mkconfig -o boot/grub/grub.cfg
+sleep 2
+git clone https://github.com/hegde-atri/arch-install
+cd arch-install
+printf '\033c'
+echo "------------------------------"
+echo "|    what are you using ?    |"
+echo "|   a) desktop               |"
+echo "|   b) laptop                |"
+echo "------------------------------"
+echo -n "Your choice: "
+read choice
+if [ "$choice" == "b" ] ; then
+   ./laptop.sh
+   exit
+else
+    ./desktop.sh
+    exit
+fi
