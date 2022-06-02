@@ -1,6 +1,6 @@
 # My Arch installer
 
-Deploys arch on target system. Use postinstallation script to install a Desktop environment(Coming soon) or DWM.
+Deploys arch on target system. Configured to work on my devices. Feel free to fork this and customize it. You can choose either desktop or laptop profile. Laptop profile still WIP, but the desktop profile is fully functional.
 
 This script it not intended for complete beginners. Make sure to be familiar with installing arch or read through the arch installation guide.
 
