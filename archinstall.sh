@@ -50,6 +50,7 @@ mount --mkdir $homepartition /mnt/home
 mount --mkdir $efipartition /mnt/boot
 swapon $swappartition
 sleep 2
+genfstab -U /mnt >> /mnt/etc/fstab
 pacstrap /mnt base base-devel linux linux-firmware
 # getting ready to arch-chroot
 sed '1,/^#p2start$/d' `basename $0` > /mnt/archinstall2.sh
@@ -107,14 +108,14 @@ grub-install --target=x86_64-efi --efi-directory=boot --removable
 echo "GRUB_DISABLE_OS_PROBER=false" >> /etc/default/grub
 grub-mkconfig -o boot/grub/grub.cfg
 
-pacman -S --noconfirm xorg lxappearance noto-fonts noto-fonts-emoji \
+pacman -S --noconfirm --disable-download-timeout xorg lxappearance noto-fonts noto-fonts-emoji \
     picom noto-fonts-cjk ttf-jetbrains-mono ttf-font-awesome feh sxiv \
     mpv zathura zathura-pdf-mupdf ffmpeg fzf man-db python-pywal unclutter \
     xclip zip unzip unrar papirus-icon-theme dosfstools ntfs-3g git sxhkd \
     pipewire pipewire-pulse vim arc-gtk-theme rsync firefox neofetch \
     libnotify dunst jq aria2 dhcpcd wpa_supplicant pamixer mpd ncmpcpp \
     xdg-user-dirs libconfig polkit kitty networkmanager emacs polkit-gnome \
-    gnome-keyring euberzug ranger stow bspwm polybar \
+    gnome-keyring ueberzug ranger stow bspwm polybar \
     exa wmname
 
 echo "-------------------------------------"
