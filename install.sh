@@ -1,17 +1,12 @@
-# This script will deploy arch linux with options to install de/wm
-#
-#######################################################
-# part1: make necassary partitions and chroot into it #
-#######################################################
+# Deploy hegde-atri's arch config
 printf '\033c'
-echo "----------------------------------------------"
-echo "|        hegde_atri's arch installer         |"
-echo "----------------------------------------------"
+echo "-------------------------------------"
+echo "|    hegde-atri's arch installer    |"
+echo "-------------------------------------"
 sed -i "s/^#ParallelDownloads = 5$/ParallelDownloads = 15/" /etc/pacman.conf
 pacman --noconfirm -Sy archlinux-keyring
 loadkeys gb
 timedatectl set-ntp true
-
 printf '\033c'
 lsblk
 echo -n "Enter drive name: "
@@ -51,7 +46,7 @@ mount --mkdir $efipartition /mnt/boot
 swapon $swappartition
 sleep 2
 pacstrap /mnt base base-devel linux linux-firmware
-# getting ready to arch-chroot
+genfstab -U /mnt >> /mnt/etc/fstab
 sed '1,/^#p2start$/d' `basename $0` > /mnt/archinstall2.sh
 chmod +x /mnt/archinstall2.sh
 echo "-----------------------------------------"
@@ -62,9 +57,6 @@ arch-chroot /mnt ./archinstall2.sh
 exit
 
 #p2start
-#################################
-# part2: arch-chroot and config #
-#################################
 printf '\033c'
 ln -sf /usr/share/zoneinfo/Europe/London /etc/localtime
 hwclock --systohc
@@ -73,19 +65,21 @@ sed -i 's/#en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/g' /etc/locale.gen
 locale-gen
 echo "LANG=en_GB.UTF-8" > /etc/locale.conf
 echo "KEYMAP=uk" > /etc/vconsole.conf
-echo -n "Enter your hostname: "
+printf '\033c'
+echo -n "Enter hostname: "
 read hostname
 echo "$hostname" > /etc/hostname
-echo $hostname > /etc/hostname
-echo "127.0.0.1       localhost" >> /etc/hosts
-echo "::1             localhost" >> /etc/hosts
-echo "127.0.1.1       $hostname.localdomain $hostname" >> /etc/hosts
+echo -ne "
+127.0.0.1       localhost
+::1             localhost
+127.0.1.1       '$hostname'.localdomain '$hostname'" > /etc/hosts
 mkinitcpio -P
-echo "---------------------------"
-echo "|   Enter root password   |"
-echo "---------------------------"
+printf '\033c'
+echo "Enter your root password"
 passwd
+printf '\033c'
 pacman --noconfirm -S grub efibootmgr os-prober
+printf '\033c'
 echo "---------------------------------------"
 echo "| select processor make for microcode |"
 echo "|=====================================|"
@@ -106,34 +100,17 @@ grub-install --target=x86_64-efi --efi-directory=boot --bootloader-id=GRUB
 grub-install --target=x86_64-efi --efi-directory=boot --removable
 echo "GRUB_DISABLE_OS_PROBER=false" >> /etc/default/grub
 grub-mkconfig -o boot/grub/grub.cfg
+sleep 2
 
-pacman -S --noconfirm xorg lxappearance noto-fonts noto-fonts-emoji \
-    picom noto-fonts-cjk ttf-jetbrains-mono ttf-font-awesome feh sxiv \
-    mpv zathura zathura-pdf-mupdf ffmpeg fzf man-db python-pywal unclutter \
-    xclip zip unzip unrar papirus-icon-theme dosfstools ntfs-3g git sxhkd \
-    pipewire pipewire-pulse vim arc-gtk-theme rsync firefox neofetch \
-    libnotify dunst jq aria2 dhcpcd wpa_supplicant pamixer mpd ncmpcpp \
-    xdg-user-dirs libconfig polkit kitty networkmanager emacs polkit-gnome \
-    gnome-keyring euberzug ranger stow bspwm polybar \
-    exa wmname
 
-echo "-------------------------------------"
-echo "| Do you want nvidia drivers? (y/n) |"
-echo "-------------------------------------"
-echo -n "Your response: "
-read nvdia
-if [ "$nvidia" == "y" ] ; then
-  pacman -S --noconfirm nvidia nvidia-utils nvtop
-fi
+
 systemctl enable NetworkManager.service
 echo "%wheel ALL=(ALL) ALL" >> /etc/sudoers
-echo "-----------------------"
-echo "|    Creating user    |"
-echo "-----------------------"
+echo "---------------------"
 echo -n "Enter your username: "
 read username
 useradd -m -G wheel $username
 passwd $username
-echo "---------------------"
-echo "finished base install"
-exit
+
+endpath=/home/$username/source/archinstall
+git clone https://github.com/hegde-atri/arch-install "$pi_path"
