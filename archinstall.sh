@@ -108,6 +108,8 @@ grub-install --target=x86_64-efi --efi-directory=boot --removable
 echo "GRUB_DISABLE_OS_PROBER=false" >> /etc/default/grub
 grub-mkconfig -o boot/grub/grub.cfg
 
+sed -i "s/^GRUB_GFXMODE=auto$/GRUB_GFXMODE=1920x1080/" /etc/default/grub
+
 pacman -S --noconfirm --disable-download-timeout xorg lxappearance noto-fonts noto-fonts-emoji \
     picom noto-fonts-cjk ttf-jetbrains-mono ttf-font-awesome feh sxiv \
     mpv zathura zathura-pdf-mupdf ffmpeg fzf man-db python-pywal unclutter \
@@ -137,4 +139,3 @@ useradd -m -G wheel $username
 passwd $username
 echo "---------------------"
 echo "finished base install"
-exit
