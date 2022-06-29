@@ -50,8 +50,8 @@ mount --mkdir $homepartition /mnt/home
 mount --mkdir $efipartition /mnt/boot
 swapon $swappartition
 sleep 2
-genfstab -U /mnt >> /mnt/etc/fstab
 pacstrap /mnt base base-devel linux linux-firmware
+genfstab -U /mnt >> /mnt/etc/fstab
 # getting ready to arch-chroot
 sed '1,/^#p2start$/d' `basename $0` > /mnt/archinstall2.sh
 chmod +x /mnt/archinstall2.sh
