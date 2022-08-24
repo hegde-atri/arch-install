@@ -1,3 +1,5 @@
+[![CodeFactor](https://www.codefactor.io/repository/github/hegde-atri/arch-install/badge)](https://www.codefactor.io/repository/github/hegde-atri/arch-install)
+
 # My Arch installer
 
 Deploys arch on target system. Configured to work on my devices. Feel free to fork this and customize it. You can choose either desktop or laptop profile. Laptop profile still WIP, but the desktop profile is fully functional.
