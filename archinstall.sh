@@ -9,25 +9,25 @@ echo "|        hegde_atri's arch installer         |"
 echo "----------------------------------------------"
 sed -i "s/^#ParallelDownloads = 5$/ParallelDownloads = 15/" /etc/pacman.conf
 pacman --noconfirm -Sy archlinux-keyring
-loadkeys gb
+loadkeys uk
 timedatectl set-ntp true
 
 printf '\033c'
 lsblk
 echo -n "Enter drive name: "
-read drive
+read -r drive
 cfdisk $drive
 sleep 2
 printf '\033c'
 lsblk
 echo -n "Enter EFI/boot partition: "
-read efipartition
+read -r efipartition
 mkfs.vfat -F 32 $efipartition
 sleep 2
 printf '\033c'
 lsblk
 echo -n "Enter swap partition (leave empty for no swap): "
-read swappartition
+read -r swappartition
 echo "If you do not have a swap partition, ignore the error below"
 sleep 2
 mkswap $swappartition
@@ -35,13 +35,13 @@ sleep 2
 printf '\033c'
 lsblk
 echo -n "Enter your root partition: "
-read rootpartition
+read -r rootpartition
 mkfs.ext4 $rootpartition
 sleep 2
 printf '\033c'
 lsblk
 echo -n "Enter your home partition (if applicable): "
-read homepartition
+read -r homepartition
 echo "If you do not have a home partition ignore the error below"
 sleep 2
 mkfs.ext4 $homepartition
@@ -52,8 +52,8 @@ swapon $swappartition
 sleep 2
 pacstrap /mnt base base-devel linux linux-firmware
 genfstab -U /mnt >> /mnt/etc/fstab
-# getting ready to arch-chroot
-sed '1,/^#p2start$/d' `basename $0` > /mnt/archinstall2.sh
+# getting read -ry to arch-chroot
+sed '1,/^#p2start$/d' $(basename $0) > /mnt/archinstall2.sh
 chmod +x /mnt/archinstall2.sh
 echo "-----------------------------------------"
 echo "| arch-chrooting into your machine now! |"
@@ -75,7 +75,7 @@ locale-gen
 echo "LANG=en_GB.UTF-8" > /etc/locale.conf
 echo "KEYMAP=uk" > /etc/vconsole.conf
 echo -n "Enter your hostname: "
-read hostname
+read -r hostname
 echo "$hostname" > /etc/hostname
 echo $hostname > /etc/hostname
 echo "127.0.0.1       localhost" >> /etc/hosts
@@ -95,7 +95,7 @@ echo "| For AMD, enter a                    |"
 echo "| Leave blank for both                |"
 echo "---------------------------------------"
 echo -n "Your processor option: "
-read processor
+read -r processor
 if [ "$processor" == "a" ] ; then
   pacman -S --noconfirm amd-ucode
 elif [ "$processor" == "i" ] ; then
@@ -124,7 +124,7 @@ echo "-------------------------------------"
 echo "| Do you want nvidia drivers? (y/n) |"
 echo "-------------------------------------"
 echo -n "Your response: "
-read nvdia
+read -r nvdia
 if [ "$nvidia" == "y" ] ; then
   pacman -S --noconfirm nvidia nvidia-utils nvtop
 fi
@@ -134,7 +134,7 @@ echo "-----------------------"
 echo "|    Creating user    |"
 echo "-----------------------"
 echo -n "Enter your username: "
-read username
+read -r username
 useradd -m -G wheel $username
 passwd $username
 echo "---------------------"
