@@ -1,5 +1,3 @@
-# This script will deploy arch linux with options to install de/wm
-#
 #######################################################
 # part1: make necassary partitions and chroot into it #
 #######################################################
@@ -127,7 +125,10 @@ echo -n "Your response: "
 read -r nvdia
 if [ "$nvidia" == "y" ] ; then
   pacman -S --noconfirm nvidia nvidia-utils nvtop
+else
+  pacman -S --noconfirm xf86-video-amdgpu
 fi
+
 systemctl enable NetworkManager.service
 echo "%wheel ALL=(ALL) ALL" >> /etc/sudoers
 echo "-----------------------"
