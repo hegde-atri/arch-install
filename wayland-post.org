@@ -1,218 +1,38 @@
-#+title: Arch Linux - wayland config
+#+title: Arch Linux - wayland postinstallation chores
 #+author: Atri Hegde
-#+description: An archlinux installer that will install base system with Hyprland.
+#+description: An archlinux post install script
 
-* ArchInstall for wayland
-Installs arch on target computer with wayland packages.
+Post installation chores
 
-** Prepare for live environment for installation
-Install archlinux-keyring, keyboard config, set ntp and allow parallel downloads
+** Make sure script is not running as root
 #+begin_src sh
-#######################################################
-# part1: make necassary partitions and chroot into it #
-#######################################################
-printf '\033c'
-echo "----------------------------------------------"
-echo "|        hegde_atri's arch installer         |"
-echo "----------------------------------------------"
-sed -i "s/^#ParallelDownloads = 5$/ParallelDownloads = 15/" /etc/pacman.conf
-pacman --noconfirm -Sy archlinux-keyring
-loadkeys uk
-timedatectl set-ntp true
 #+end_src
 
-** Partitioning the drive
-I delete all my previous partitions and pratition it as follows
-- 512M: EFI partition
-- <RAM-size>: Swap partition
-- Rest of space left: ext4
-
+** Install Paru
 #+begin_src sh
-printf '\033c'
-lsblk
-echo -n "Enter drive name: "
-read -r drive
-cfdisk $drive
-sleep 2
-printf '\033c'
-lsblk
-echo -n "Enter EFI/boot partition: "
-read -r efipartition
-mkfs.vfat -F 32 $efipartition
-sleep 2
-printf '\033c'
-lsblk
-echo -n "Enter swap partition: "
-read -r swappartition
-sleep 2
-mkswap $swappartition
-sleep 2
-printf '\033c'
-lsblk
-echo -n "Enter your root partition: "
-read -r rootpartition
-mkfs.ext4 $rootpartition
-sleep 2
-printf '\033c'
-sleep 2
-mount $rootpartition /mnt
-mount --mkdir $efipartition /mnt/boot
-swapon $swappartition
 #+end_src
 
-** Pacstrap
-Pacstrap ~/mnt~, and then ~genfstab~ which writed the partition details to ~/mnt/etc/fstab~.
 
-#+begin_src
-pacstrap -K /mnt base base-devel linux linux-firmware
-genfstab -U /mnt >> /mnt/etc/fstab
+** Install hyprland, xdgw, and waybar-hyprland
+#+begin_src sh
 #+end_src
 
-** Arch-chroot into the machine
-First we need to copy our script from part 2 into the machine for it to be executed.
 
+** Instally ly?
 #+begin_src sh
-sed '1,/^#p2start$/d' $(basename $0) > /mnt/archinstall2.sh
-chmod +x /mnt/archinstall2.sh
-echo "-----------------------------------------"
-echo "| arch-chrooting into your machine now! |"
-echo "-----------------------------------------"
-sleep 2
-arch-chroot /mnt ./archinstall2.sh
-exit
 #+end_src
 
-** Start "part 2" of our script
+
+**
 #+begin_src sh
-#p2start
-#################################
-# part2: arch-chroot and config #
-#################################
-printf '\033c'
 #+end_src
 
-** Configuring locales
-Here I am creating symlink from Europe/London as our localtime. So when people look at ~/etc/localtime~ it points to ~/usr/share/zoneinfo/Europe/London~.
-I am then allowing parallel downloads, settings our locale and generating them.
-then we set our language and keymap to uk.
 
+**
 #+begin_src sh
-ln -sf /usr/share/zoneinfo/Europe/London /etc/localtime
-hwclock --systohc
-sed -i "s/^#ParallelDownloads = 5$/ParallelDownloads = 15/" /etc/pacman.conf
-sed -i 's/#en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/g' /etc/locale.gen
-locale-gen
-echo "LANG=en_GB.UTF-8" > /etc/locale.conf
-echo "KEYMAP=uk" > /etc/vconsole.conf
 #+end_src
 
-** Hostname and ~/etc/hosts~
 
+**
 #+begin_src sh
-echo -n "Enter your hostname: "
-read -r hostname
-echo $hostname > /etc/hostname
-echo "127.0.0.1       localhost" >> /etc/hosts
-echo "::1             localhost" >> /etc/hosts
-echo "127.0.1.1       $hostname.localdomain $hostname" >> /etc/hosts
-mkinitcpio -P
-#+end_src
-
-** Set root password
-#+begin_src sh
-echo "---------------------------"
-echo "|   Enter root password   |"
-echo "---------------------------"
-passwd
-#+end_src
-
-** Install drivers
-Install appropriate drivers based on hardware.
-
-#+begin_src sh
-echo "---------------------------------------"
-echo "| select processor make for microcode |"
-echo "|=====================================|"
-echo "| For Intel, enter i                  |"
-echo "| For AMD, enter a                    |"
-echo "| Leave blank for both                |"
-echo "---------------------------------------"
-echo -n "Your processor option: "
-read -r processor
-if [ "$processor" == "a" ] ; then
-  pacman -S --noconfirm amd-ucode
-elif [ "$processor" == "i" ] ; then
-  pacman -S --noconfirm intel-ucode
-else
-  pacman -S --noconfirm intel-ucode amd-ucode
-fi
-echo "---------------------------------------"
-echo "|    select gpu option for drivers    |"
-echo "|=====================================|"
-echo "| For Nvidia, enter n                 |"
-echo "| For AMD, enter a                    |"
-echo "---------------------------------------"
-echo -n "Your response: "
-read -r gpu
-if [ "$gpu" == "n" ] ; then
-  pacman -S --noconfirm nvidia nvidia-utils nvtop
-elif [ "$gpu" == "a" ] ; then
-  pacman -S --noconfirm xf86-video-amdgpu
-fi
-#+end_src
-
-** Install GRUB bootloader
-Install grub normally and with ~removable~ flag for compatibility reasons. Then change GRUB
-menu's resolution to ~1920x0180~
-#+begin_src sh
-grub-install --target=x86_64-efi --efi-directory=boot --bootloader-id=GRUB
-grub-install --target=x86_64-efi --efi-directory=boot --removable
-sed -i "s/^GRUB_GFXMODE=auto$/GRUB_GFXMODE=1920x1080/" /etc/default/grub
-echo "GRUB_DISABLE_OS_PROBER=false" >> /etc/default/grub
-grub-mkconfig -o boot/grub/grub.cfg
-#+end_src
-
-** Install packages
-
-#+begin_src sh
-pacman -S --noconfirm --disable-download-timeout lxappearance noto-fonts noto-fonts-emoji \
-    noto-fonts-cjk ttf-jetbrains-mono ttf-font-awesome feh \
-    mpv zathura zathura-pdf-mupdf ffmpeg fzf man-db \
-    zip unzip unrar papirus-icon-theme dosfstools ntfs-3g git \
-    pipewire pipewire-pulse vim neovim arc-gtk-theme rsync firefox neofetch \
-    libnotify dunst jq aria2 dhcpcd wpa_supplicant pamixer ncmpcpp \
-    xdg-user-dirs libconfig polkit kitty networkmanager emacs polkit-gnome \
-    gnome-keyring ueberzug ranger obs-studio linux-headers v4l2loopback-dkms \
-    exa wl-clipboard mako vlc wofi btop yt-dlp
-#+end_src
-
-** Start services
-We will start networkmanager service so we can connect to the internet.
-#+begin_src sh
-systemctl enable NetworkManager.service
-#+end_src
-
-** Create user
-Let's create a user and add it to the sudeors group. Let's also modify the sudoers file
-to allow password authentication for users in the sudoers group.
-
-#+begin_src sh
-echo "%wheel ALL=(ALL) ALL" >> /etc/sudoers
-echo "-----------------------"
-echo "|    Creating user    |"
-echo "-----------------------"
-echo -n "Enter your username: "
-read -r username
-useradd -m -G wheel $username
-passwd $username
-usermod -aG video $username
-#+end_src
-
-** End of installation
-Display a link to my arch wiki :)
-#+begin_src sh
-echo "----------------------------------------------------"
-echo "|              finished base install               |"
-echo "|  Visit arch-wiki.hegdeatri.com for more tips :)  |"
-echo "----------------------------------------------------"
 #+end_src

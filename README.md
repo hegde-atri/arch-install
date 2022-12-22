@@ -2,13 +2,13 @@
 
 # My Arch installer
 
-Deploys arch on target system. Configured to work on my devices. Feel free to fork this and customize it. You can choose either desktop or laptop profile. Laptop profile still WIP, but the desktop profile is fully functional.
+Deploys arch on target system. Configured to work on my devices. Feel free to fork this and customize it.
 
 This script it not intended for complete beginners. Make sure to be familiar with installing arch or read through the arch installation guide.
 
 Only supports efi installations.
 
-Check my [arch guide (WIP)](https://github.com/hegde-atri/archlinux-help-sheet)
+Check my [arch guide (WIP)](https://arch-wiki.hegdeatri.com)
 
 ## Usage
 
