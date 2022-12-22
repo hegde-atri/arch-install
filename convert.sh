@@ -1,14 +1,14 @@
-#!bin/sh
+#!/bin/sh
 
-filename="$1"
-[ -z "$1" ] && filename='archinstall-wayland'
+source="$1"
+target="$2"
 
 # Extract the shebang from README.org and write it to new file.
-grep ':shebang' README.org | cut -d \" -f2 > "$filename"
+grep ':shebang' "$source" | cut -d \" -f2 > "$target"
 
 # Extract all '#+begin/end_src' blocks from README.org and append them to file;
 awk '/^#\+begin_src/{flag=1;next}/^#\+end_src/{flag=0;print ""}flag' \
-    README.org | head -n -1 >> "$filename"
+    "$source" | head -n -1 >> "$target"
 
 # Make the new file executable
-chmod +x "$filename" 
+chmod +x "$target"

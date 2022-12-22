@@ -140,3 +140,4 @@ useradd -m -G wheel $username
 passwd $username
 echo "---------------------"
 echo "finished base install"
+echo "---------------------"
