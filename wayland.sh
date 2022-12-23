@@ -1,13 +1,3 @@
-#+title: Arch Linux - wayland config
-#+author: Atri Hegde
-#+description: An archlinux installer that will install base system with Hyprland.
-
-* ArchInstall for wayland
-Installs arch on target computer with wayland packages.
-
-** Prepare for live environment for installation
-Install archlinux-keyring, keyboard config, set ntp and allow parallel downloads
-#+begin_src bash
 #!/bin/bash
 printf '\033c'
 echo "----------------------------------------------"
@@ -17,21 +7,9 @@ sed -i "s/^#ParallelDownloads = 5$/ParallelDownloads = 15/" /etc/pacman.conf
 pacman --noconfirm -Sy archlinux-keyring gum
 loadkeys uk
 timedatectl set-ntp true
-#+end_src
 
-** Declaring Gum style
-This will make the script look pretty
-#+begin_src sh
 gum style --border normal --margin "1" --padding "1 2" --border-foreground 212 "Hello, there\! Welcome to my $(gum style --foreground 212 'Arch Installer')."
-#+end_src
 
-** Partitioning the drive
-I delete all my previous partitions and pratition it as follows
-- 512M: EFI partition
-- <RAM-size>: Swap partition
-- Rest of space left: ext4
-
-#+begin_src sh
 printf '\033c'
 lsblk
 drive=$(gum input --placeholder "Choose drive")
@@ -53,40 +31,20 @@ printf '\033c'
 gum spin --spinner dot --title "Mounting Root partition" -- mount $rootpartition /mnt
 gum spin --spinner dot --title "Mounting Boot parition" -- mount --mkdir $efipartition /mnt/boot
 gum spin --spinner dot --title "Enabling swap" -- swapon $swappartition
-#+end_src
 
-** Pacstrap
-Pacstrap ~/mnt~, and then ~genfstab~ which writed the partition details to ~/mnt/etc/fstab~.
-
-#+begin_src sh
 gum style --border normal --margin "1" --padding "1 2" --border-foreground 212 "The script will now $(gum style --foreground 212 'pacstrap') your system."
 pacstrap -K /mnt base base-devel linux linux-firmware gum
 genfstab -U /mnt >> /mnt/etc/fstab
-#+end_src
 
-** Arch-chroot into the machine
-First we need to copy our script from part 2 into the machine for it to be executed.
-
-#+begin_src sh
 sed '1,/^#p2start$/d' $(basename $0) > /mnt/archinstall2.sh
 chmod +x /mnt/archinstall2.sh
 gum style --border normal --margin "1" --padding "1 2" --border-foreground 212 "The script will now $(gum style --foreground 212 'Arch-chroot') into your system."
 arch-chroot /mnt ./archinstall2.sh
 exit
-#+end_src
 
-** Start "part 2" of our script
-#+begin_src sh
 #p2start
 printf '\033c'
-#+end_src
 
-** Configuring locales
-Here I am creating symlink from Europe/London as our localtime. So when people look at ~/etc/localtime~ it points to ~/usr/share/zoneinfo/Europe/London~.
-I am then allowing parallel downloads, settings our locale and generating them.
-then we set our language and keymap to uk.
-
-#+begin_src sh
 ln -sf /usr/share/zoneinfo/Europe/London /etc/localtime
 hwclock --systohc
 sed -i "s/^#ParallelDownloads = 5$/ParallelDownloads = 15/" /etc/pacman.conf
@@ -94,29 +52,17 @@ sed -i 's/#en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/g' /etc/locale.gen
 locale-gen
 echo "LANG=en_GB.UTF-8" > /etc/locale.conf
 echo "KEYMAP=uk" > /etc/vconsole.conf
-#+end_src
 
-** Hostname and ~/etc/hosts~
-
-#+begin_src sh
 hostname=$(gum input --placeholder "Enter your hostname")
 echo $hostname > /etc/hostname
 echo "127.0.0.1       localhost" >> /etc/hosts
 echo "::1             localhost" >> /etc/hosts
 echo "127.0.1.1       $hostname.localdomain $hostname" >> /etc/hosts
 gum spin --spinner dot --title "Running mkinitcpio" -- mkinitcpio -P
-#+end_src
 
-** Set root password
-#+begin_src sh
 gum style --border normal --margin "1" --padding "1 2" --border-foreground 212 "Enter your $(gum style --foreground 212 'root') password"
 passwd
-#+end_src
 
-** Install drivers
-Install appropriate drivers based on hardware.
-
-#+begin_src sh
 gum style --border normal --margin "1" --padding "1 2" --border-foreground 212 "Enter your $(gum style --foreground 212 'CPU') for microcode."
 processor=$(gum choose "Intel" "AMD")
 if [ "$processor" == "Intel" ] ; then
@@ -137,22 +83,13 @@ elif [ "$gpu" == "AMD with NVIDIA" ] ; then
 elif [ "$gpu" == "AMD" ] ; then
   pacman -S --noconfirm xf86-video-amdgpu
 fi
-#+end_src
 
-** Install GRUB bootloader
-Install grub normally and with ~removable~ flag for compatibility reasons. Then change GRUB
-menu's resolution to ~1920x0180~
-#+begin_src sh
 grub-install --target=x86_64-efi --efi-directory=boot --bootloader-id=GRUB
 grub-install --target=x86_64-efi --efi-directory=boot --removable
 sed -i "s/^GRUB_GFXMODE=auto$/GRUB_GFXMODE=1920x1080/" /etc/default/grub
 echo "GRUB_DISABLE_OS_PROBER=false" >> /etc/default/grub
 grub-mkconfig -o boot/grub/grub.cfg
-#+end_src
 
-** Install packages
-
-#+begin_src sh
 pacman -S --noconfirm --disable-download-timeout lxappearance noto-fonts noto-fonts-emoji \
     noto-fonts-cjk ttf-jetbrains-mono ttf-font-awesome feh exfat-utils\
     mpv zathura zathura-pdf-mupdf ffmpeg fzf man-db \
@@ -162,19 +99,9 @@ pacman -S --noconfirm --disable-download-timeout lxappearance noto-fonts noto-fo
     xdg-user-dirs libconfig polkit kitty networkmanager emacs polkit-gnome \
     gnome-keyring ueberzug ranger obs-studio linux-headers v4l2loopback-dkms \
     exa wl-clipboard mako vlc wofi btop yt-dlp
-#+end_src
 
-** Start services
-We will start networkmanager service so we can connect to the internet.
-#+begin_src sh
 systemctl enable NetworkManager.service
-#+end_src
 
-** Create user
-Let's create a user and add it to the sudeors group. Let's also modify the sudoers file
-to allow password authentication for users in the sudoers group.
-
-#+begin_src sh
 echo "%wheel ALL=(ALL) ALL" >> /etc/sudoers
 gum style --border normal --margin "1" --padding "1 2" --border-foreground 212 "Enter your $(gum style --foreground 212 "username")"
 username=$(gum input --placeholder "username")
@@ -182,14 +109,9 @@ useradd -m -G wheel $username
 passwd $username
 usermod -aG video $username
 gum style --border normal --margin "1" --padding "1 2" --border-foreground 212 "Enter your $(gum style --foreground 212 "username")"
-#+end_src
 
-** End of installation
-Display a link to my arch wiki :)
-#+begin_src sh
 gum style --border normal --margin "1" --padding "1 2" --border-foreground 212 \
     "Arch linux is now installed" \
     "Reboot your computer into the grub menu\!" \
     "Visit https://arch-wiki.hegdeatri.com for a helpful Arch guide"
 
-#+end_src

@@ -8,9 +8,12 @@ This script it not intended for complete beginners. Make sure to be familiar wit
 
 Only supports efi installations.
 
-Check my [arch guide (WIP)](https://arch-wiki.hegdeatri.com)
+Check my [Arch wiki](https://arch-wiki.hegdeatri.com)
 
 ## Usage
+
+For Wayland install read [its document](./wayland.org)
+For Wayland post-install read [its document](./wayland-post.org)
 
 After booting into your arch live ISO, make sure you have a working internet connection.
 
