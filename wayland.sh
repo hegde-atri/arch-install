@@ -84,6 +84,7 @@ elif [ "$gpu" == "AMD" ] ; then
   pacman -S --noconfirm xf86-video-amdgpu
 fi
 
+pacman -S --noconfirm grub os-prober efibootmgr
 grub-install --target=x86_64-efi --efi-directory=boot --bootloader-id=GRUB
 grub-install --target=x86_64-efi --efi-directory=boot --removable
 sed -i "s/^GRUB_GFXMODE=auto$/GRUB_GFXMODE=1920x1080/" /etc/default/grub

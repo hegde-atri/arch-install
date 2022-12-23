@@ -145,6 +145,7 @@ fi
 Install grub normally and with ~removable~ flag for compatibility reasons. Then change GRUB
 menu's resolution to ~1920x0180~
 #+begin_src sh
+pacman -S --noconfirm grub os-prober efibootmgr
 grub-install --target=x86_64-efi --efi-directory=boot --bootloader-id=GRUB
 grub-install --target=x86_64-efi --efi-directory=boot --removable
 sed -i "s/^GRUB_GFXMODE=auto$/GRUB_GFXMODE=1920x1080/" /etc/default/grub
