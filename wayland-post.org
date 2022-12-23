@@ -6,6 +6,8 @@ Post installation chores
 
 ** Make sure script is not running as root
 #+begin_src sh
+#!/bin/sh
+
 #+end_src
 
 ** Install Paru
