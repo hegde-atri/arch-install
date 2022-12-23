@@ -2,8 +2,10 @@
 #+author: Atri Hegde
 #+description: An archlinux installer that will install base system with Hyprland.
 
-* ArchInstall for wayland
 Installs arch on target computer with wayland packages.
+
+Install ~git~ and clone the repository and ~cd~ into it in your live iso. Then run the command ~./convert.sh wayland.org wayland.sh~ to generate the install script from this document. This
+ensures you have the latest version of the installer. Then execute the installer using ~./wayland.sh~
 
 ** Prepare for live environment for installation
 Install archlinux-keyring, keyboard config, set ntp and allow parallel downloads
@@ -36,23 +38,23 @@ printf '\033c'
 lsblk
 drive=$(gum input --placeholder "Choose drive")
 cfdisk $drive
-gum spin --spinner dot --title "Waiting for changes to persist" -- sleep 2
+gum spin --spinner line --title "Waiting for changes to persist" -- sleep 2
 printf '\033c'
 lsblk
 efipartition=$(gum input --placeholder "EFI/Boot partition")
-gum spin --spinner dot --title "Formatting EFI partition" -- mkfs.vfat -F 32 $efipartition
+gum spin --spinner line --title "Formatting EFI partition" -- mkfs.vfat -F 32 $efipartition
 printf '\033c'
 lsblk
 swappartition=$(gum input --placeholder "Swap partition")
-gum spin --spinner dot --title "Creating swap partition" -- mkswap $swappartition
+gum spin --spinner line --title "Creating swap partition" -- mkswap $swappartition
 printf '\033c'
 lsblk
 rootpartition=$(gum input --placeholder "Root partition")
-gum spin --spinner dot --title "Formatting root partition" -- mkfs.ext4 -F $rootpartition
+gum spin --spinner line --title "Formatting root partition" -- mkfs.ext4 -F $rootpartition
 printf '\033c'
-gum spin --spinner dot --title "Mounting Root partition" -- mount $rootpartition /mnt
-gum spin --spinner dot --title "Mounting Boot parition" -- mount --mkdir $efipartition /mnt/boot
-gum spin --spinner dot --title "Enabling swap" -- swapon $swappartition
+gum spin --spinner line --title "Mounting Root partition" -- mount $rootpartition /mnt
+gum spin --spinner line --title "Mounting Boot parition" -- mount --mkdir $efipartition /mnt/boot
+gum spin --spinner line --title "Enabling swap" -- swapon $swappartition
 #+end_src
 
 ** Pacstrap
@@ -104,7 +106,7 @@ echo $hostname > /etc/hostname
 echo "127.0.0.1       localhost" >> /etc/hosts
 echo "::1             localhost" >> /etc/hosts
 echo "127.0.1.1       $hostname.localdomain $hostname" >> /etc/hosts
-gum spin --spinner dot --title "Running mkinitcpio" -- mkinitcpio -P
+gum spin --spinner line --title "Running mkinitcpio" -- mkinitcpio -P
 #+end_src
 
 ** Set root password

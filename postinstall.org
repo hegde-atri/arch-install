@@ -1,4 +1,4 @@
-#+title: Arch Linux - wayland postinstallation chores
+#+title: Arch Linux - X11 postinstallation chores
 #+author: Atri Hegde
 #+description: An archlinux post install script
 
@@ -24,37 +24,27 @@ if [ "$user" == "root" ] ; then
 fi
 #+end_src
 
-** Ask for packages they want
-
-#+begin_src sh
-#+end_src
+#+RESULTS:
 
 ** Install Paru
 #+begin_src sh
-if [ ] ; then
-    mkdir ~/.source
-    pushd ~/.source
-    gum style --border normal --margin "1" --padding "1 2" --border-foreground 212 \
-        "Not installing Paru, an AUR helper" \
-        "Latest stable of rust will also be installed through rustup"
-    sleep 3
-    sudo pacman -S --noconfirm base-devel rustup git
-    rustup default stable
-    git clone https://aur.archlinux.org/paru.git
-    cd paru
-    makepkg -si
-fi
+mkdir ~/.source
+pushd ~/.source
+gum style --border normal --margin "1" --padding "1 2" --border-foreground 212 \
+    "Not installing Paru, an AUR helper" \
+    "Latest stable of rust will also be installed through rustup"
+sleep 3
+sudo pacman -S --noconfirm base-devel rustup git
+rustup default stable
+git clone https://aur.archlinux.org/paru.git
+cd paru
+makepkg -si
 #+end_src
 
-** Install the zen kernel
-
-#+begin_src sh
-#+end_src
-
-** Install hyprland, xdgw, and waybar-hyprland
+** Install bspwm, sxhkd and polybar
 #+begin_src sh
 gum style --border normal --margin "1" --padding "1 2" --border-foreground 212 \
-    "Now we will be installing Hyprland and its related packages" \
+    "Now we will be installing bspwm, sxhkd and polybar" \
     "Hit the enter key when prompted for a choice and type your password as prompted"
 sleep 5
 paru -S hyprland

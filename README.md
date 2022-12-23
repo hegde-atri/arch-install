@@ -13,6 +13,7 @@ Check my [Arch wiki](https://arch-wiki.hegdeatri.com)
 ## Usage
 
 For Wayland install read [its document](./wayland.org)
+
 For Wayland post-install read [its document](./wayland-post.org)
 
 After booting into your arch live ISO, make sure you have a working internet connection.
