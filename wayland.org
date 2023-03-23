@@ -164,7 +164,7 @@ pacman -S --noconfirm --disable-download-timeout lxappearance noto-fonts noto-fo
     libnotify jq aria2 dhcpcd wpa_supplicant pamixer ncmpcpp \
     xdg-user-dirs libconfig polkit kitty networkmanager emacs polkit-gnome \
     gnome-keyring ueberzug ranger obs-studio linux-headers v4l2loopback-dkms \
-    exa wl-clipboard mako vlc wofi btop yt-dlp
+    exa wl-clipboard mako vlc wofi btop yt-dlp gtk-engine-murrine
 #+end_src
 
 ** Start services
